@@ -1,0 +1,70 @@
+﻿
+body {
+    width: 1000px;
+    font-family: "Roboto", sans-serif;
+    font-size: 18px;
+    color: lemonchiffon;
+    margin: 0 auto;
+    background-color: #201011;
+}
+header {
+    height: 200px;
+}
+.title{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-size: 40px;
+    color: darksalmon;
+    text-align: center;
+}
+main {
+    position: relative;
+    display: flex;
+    width: 1000px;
+    height: 500px;
+    min-height: 100%;
+    margin: 0 auto;
+}
+aside{
+    background-color: #201011;
+    height: 540px;
+    width: 200px;
+}
+#game{
+    width: 600px;
+    height: 550px;
+    background: #fff;
+}
+.field{
+    display: grid;
+    width: 600px;
+    height: 550px;
+    grid-gap: 5px;
+}
+table{
+    background-color: #201011;
+    padding-left: 4px;
+}
+.ceil{
+    height: 50px;
+    width: 55px;
+    background-color: lemonchiffon;
+}
+.button{
+    width: 150px;
+    height: 45px;
+    font-size: 22px;
+    text-align: center;
+    padding-top: 15px;
+    margin:40px 25px 0 25px;
+    background-color: #201011;
+    color: darksalmon;
+    border: 2px solid darksalmon;
+}
+
+img {
+    position: absolute;
+    height: 45px;
+    width: 35px;
+    z-index: 10;
+}
