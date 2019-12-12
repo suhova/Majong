@@ -34,8 +34,12 @@ const mix_button = document.getElementById('mix');
 const reset_button = document.getElementById('reset');
 let firstClick = false;
 let firstWing;
-let interval, timout;
+let timeouts = [];
+let intervals = [];
 let path = [];
+let n = [];
+let p = [];
+let deq = [];
 const field = [];
 let all_wings = [];
 for (let i = 0; i < 10; i++) {
@@ -86,7 +90,6 @@ function mix() {
     for (let i = 0; i < 10; i++) {
         for (let j = 0; j < 10; j++) {
             if (!field[i][j].isDeleted()) {
-                console.log(i + " " + j)
                 let x = ceil.item(i * 10 + j).getBoundingClientRect().x - mainBlock.offsetLeft + window.pageXOffset + 5;
                 let y = ceil.item(i * 10 + j).getBoundingClientRect().y - mainBlock.offsetTop + window.pageYOffset + 2;
                 shuffled[c].set(x, y, i, j);
@@ -101,8 +104,14 @@ function mix() {
 }
 
 function reset() {
-    clearInterval(interval);
-    clearTimeout(timout);
+    let len1 = timeouts.length;
+    let len2 = intervals.length;
+    for (let i = 0; i < len1; i++) {
+        timeouts[i] = clearTimeout(timeouts[i]);
+    }
+    for (let i = 0; i < len2; i++) {
+        intervals[i] = clearTimeout(intervals[i]);
+    }
     shuffled = all_wings;
     shuffleArray(shuffled);
     let c = 0;
@@ -112,6 +121,7 @@ function reset() {
             let y = ceil.item(i * 10 + j).getBoundingClientRect().y - mainBlock.offsetTop + window.pageYOffset + 2;
             shuffled[c].set(x, y, i, j);
             field[i][j] = shuffled[c];
+            img.item(shuffled[c].num).style.transform = "scale(1, 1)";
             img.item(shuffled[c].num).style.left = x + "px";
             img.item(shuffled[c].num).style.top = y + "px";
             img.item(shuffled[c].num).style.width = 35 + "px";
@@ -159,70 +169,85 @@ function isItPair(secondWing) {
     if (firstWing.type !== secondWing.type || firstWing === secondWing) {
         return false;
     } else {
-        return searchPath(firstWing, secondWing, 0, 0);
+        let deep = 0;
+        path = [];
+        n = [];
+        p = [];
+        deq = [];
+        searchPath(firstWing, secondWing);
+
+        if (path.length === 0) return false;
+        let u = path[0];
+        let uNum = u.i*10+u.j;
+
+        while (p[uNum] !== undefined) {
+             if (n[p[uNum]] !== n[uNum]) {
+                path.unshift(field[Math.floor(p[uNum]/10)][p[uNum]%10]);
+                deep++;
+                if (deep > 3) return false;
+            }
+            uNum = p[uNum];
+        }
+        return true;
     }
 }
 
-function searchPath(cur, to, level, napr) {
-    console.log(path.length);//////////////////////////////////////////////////////
-    level = Number(level);
-    if (cur.num === to.num) {
-        path.push(cur);
-        return true;
-    } else if (cur.isDeleted() || napr === 0) {
-        let x = cur.i;
-        let y = cur.j;
-        let f = false;
-        if (x + 1 < 10 && napr !== 3) {
-            if (napr === 1 || napr === 0) {
-                f = searchPath(field[x + 1][y], to, level, 1);
-                if (f) return true;
-            } else if (level !== 2) {
-                f = searchPath(field[x + 1][y], to, level + 1, 1);
-                if (f) {
-                    path.push(cur);
-                    return true;
-                }
-            }
-        }
-        if (y + 1 < 10 && napr !== 4) {
-            if (napr === 2 || napr === 0) {
-                f = searchPath(field[x][y + 1], to, level, 2);
-                if (f) return true;
-            } else if (level !== 2) {
-                f = searchPath(field[x][y + 1], to, level + 1, 2);
-                if (f) {
-                    path.push(cur);
-                    return true;
-                }
-            }
-        }
-        if (x - 1 >= 0 && napr !== 1) {
-            if (napr === 3 || napr === 0) {
-                f = searchPath(field[x - 1][y], to, level, 1);
-                if (f) return true;
-            } else if (level !== 2) {
-                f = searchPath(field[x - 1][y], to, level + 1, 3);
-                if (f) {
-                    path.push(cur);
-                    return true;
-                }
-            }
-        }
-        if (y - 1 >= 0 && napr !== 2) {
-            if (napr === 4 || napr === 0) {
-                f = searchPath(field[x][y - 1], to, level, 4);
-                if (f) return true;
-            } else if (level !== 2) {
-                f = searchPath(field[x][y - 1], to, level + 1, 4);
-                if (f) {
-                    path.push(cur);
-                    return true;
-                }
-            }
+
+function isChildDestination(cur, to) {
+    let x = cur.i;
+    let y = cur.j;
+    let c = x * 10 + y;
+    if (x + 1 < 10 && p[c + 10] === undefined && n[c] !== 2) {
+        p[c + 10] = c;
+        n[c + 10] = 1;
+
+        if (field[x + 1][y].isDeleted()) {
+            deq.push(field[x + 1][y]);
+        } else if (field[x + 1][y].num === to.num) {
+            return field[x + 1][y];
         }
     }
-    return false;
+    if (x - 1 >= 0 && p[c - 10] === undefined && n[c] !== 1) {
+        p[c - 10] = c;
+        n[c - 10] = 2;
+        if (field[x - 1][y].isDeleted()) {
+            deq.push(field[x - 1][y]);
+        } else if (field[x - 1][y].num === to.num) {
+            return field[x - 1][y];
+        }
+    }
+    if (y - 1 >= 0 && p[c - 1] === undefined && n[c] !== 4) {
+        p[c - 1] = c;
+        n[c - 1] = 3;
+
+        if (field[x][y-1].isDeleted()) {
+            deq.push(field[x][y - 1]);
+        } else if (field[x][y - 1].num === to.num) {
+            return field[x][y - 1];
+        }
+    }
+    if (y + 1 < 10 && p[c + 1] === undefined && n[c] !== 3) {
+        p[c + 1] = c;
+        n[c + 1] = 4;
+        if (field[x][y+1].isDeleted()) {
+            deq.push(field[x][y + 1]);
+        } else if (field[x][y + 1].num === to.num) {
+            return field[x][y + 1];
+        }
+    }
+    return undefined;
+}
+
+function searchPath(cur, to) {
+    let f = isChildDestination(cur, to);
+    if (f === undefined) {
+        while( deq.length!==0){
+            let child = deq.shift();
+            searchPath(child, to);
+        }
+    } else {
+        path.push(f);
+    }
 }
 
 
@@ -232,14 +257,14 @@ function fly(secondWing) {
     del(secondWing);
     img.item(firstWing.num).style.transition = "left " + 1 + "s, top " + 1 + "s";
     img.item(secondWing.num).style.transition = "left " + 1 + "s, top " + 1 + "s";
-    path.pop();
-    move(path.pop());
-    let w = path.pop();
+    path.shift();
+    move(path.shift());
+    let w = path.shift();
     if (w !== undefined) {
         cnt++;
         setTimeout(() => {
                 move(w);
-                w = path.pop();
+                w = path.shift();
                 if (w !== undefined) {
                     cnt++;
                     setTimeout(() => {
@@ -253,13 +278,12 @@ function fly(secondWing) {
 }
 
 function flutter(w1, w2, cnt) {
-    timout = setTimeout(() => {
+    let timout = setTimeout(() => {
         let cnt = 0;
-        interval = setInterval(() => {
+        let interval = setInterval(() => {
+            intervals.push(interval);
+            timeouts.push(timout);
             if (cnt % 2 === 0) {
-                console.log(img.item(w2.num).style.left);
-                console.log(img.item(w2.num).offsetLeft);
-                console.log(w2.num.x);
                 img.item(w2.num).style.left = img.item(w2.num).offsetLeft + 15 + "px";
                 img.item(w1.num).style.width = 20 + "px";
                 img.item(w2.num).style.width = 20 + "px";
@@ -277,8 +301,8 @@ function flutter(w1, w2, cnt) {
         img.item(w2.num).style.transition = "top " + 5 + "s";
         img.item(w2.num).style.top = -400 + "px";
         img.item(w1.num).style.top = -400 + "px";
-
     }, cnt * 1000 + 500);
+
 }
 
 function move(dest) {
