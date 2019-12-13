@@ -1,0 +1,60 @@
+
+body {
+    width: 1000px;
+    font-family: "Roboto", sans-serif;
+    margin: 0 auto;
+    background-color: #201011;
+}
+main{
+    margin-top: 100px;
+}
+
+#end_game{
+    width: 400px;
+    height: 400px;
+    font-size: 40px;
+    text-align: center;
+    color: darksalmon;
+    border: 2px solid darksalmon;
+    box-shadow: 0 2px 1px 2px rgba(255, 145, 100, 0.15);
+    border-radius: 1px;
+    margin: 0 auto;
+}
+.win{
+    margin-top: 30px;
+    font-weight: bolder;
+}
+.score_text{
+    font-size: 30px;
+    margin: 20px;
+    margin-top: 40px;
+    color: lemonchiffon;
+}
+.score{
+    width: 350px;
+    height: 60px;
+    font-size: 38px;
+    font-weight: bolder;
+    margin: 0 auto;
+    background-color: lemonchiffon;
+    color: #ae6457;
+    padding-top: 10px;
+    border-radius: 2px;
+}
+#new{
+    width: 350px;
+    height: 53px;
+    font-size: 30px;
+    font-weight: bolder;
+    margin-top: 35px;
+    margin-left: 25px;
+    background-color: lemonchiffon;
+    color: #ae6457;
+    border:2px solid darksalmon;
+    padding-top: 15px;
+    border-radius: 2px;
+}
+a {
+    color: #ae6457;
+    text-decoration:none;
+}

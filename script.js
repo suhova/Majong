@@ -32,8 +32,11 @@ const mainBlock = document.getElementsByTagName('main').item(0);
 const game = document.getElementById('game');
 const mix_button = document.getElementById('mix');
 const reset_button = document.getElementById('reset');
+const page2 = document.getElementById('page2');
 let firstClick = false;
 let firstWing;
+let score = 0;
+let count = 0;
 let timeouts = [];
 let intervals = [];
 let path = [];
@@ -50,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     generateWings();
     check();
     mix_button.onclick = () => {
+        score++;
         mix();
     };
     reset_button.onclick = () => {
@@ -57,6 +61,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 });
 
+function win() {
+    localStorage.setItem(1, score);
+    window.location.replace("./pages/page2.html");
+}
 
 function createImage(type) {
     return `<img src="img\\w${type}.png" class="wing${type}">`
@@ -112,6 +120,7 @@ function reset() {
     for (let i = 0; i < len2; i++) {
         intervals[i] = clearTimeout(intervals[i]);
     }
+    score=0;
     shuffled = all_wings;
     shuffleArray(shuffled);
     let c = 0;
@@ -145,6 +154,10 @@ function check() {
                 let pair = isItPair(obj);
                 if (pair) {
                     fly(obj);
+                    count++;
+                    if (count === 50) {
+                        win();
+                    }
                 } else {
                     img.item(firstWing.num).style.transform = "scale(1, 1)";
                 }
@@ -178,11 +191,11 @@ function isItPair(secondWing) {
 
         if (path.length === 0) return false;
         let u = path[0];
-        let uNum = u.i*10+u.j;
+        let uNum = u.i * 10 + u.j;
 
         while (p[uNum] !== undefined) {
-             if (n[p[uNum]] !== n[uNum]) {
-                path.unshift(field[Math.floor(p[uNum]/10)][p[uNum]%10]);
+            if (n[p[uNum]] !== n[uNum]) {
+                path.unshift(field[Math.floor(p[uNum] / 10)][p[uNum] % 10]);
                 deep++;
                 if (deep > 3) return false;
             }
@@ -220,7 +233,7 @@ function isChildDestination(cur, to) {
         p[c - 1] = c;
         n[c - 1] = 3;
 
-        if (field[x][y-1].isDeleted()) {
+        if (field[x][y - 1].isDeleted()) {
             deq.push(field[x][y - 1]);
         } else if (field[x][y - 1].num === to.num) {
             return field[x][y - 1];
@@ -229,7 +242,7 @@ function isChildDestination(cur, to) {
     if (y + 1 < 10 && p[c + 1] === undefined && n[c] !== 3) {
         p[c + 1] = c;
         n[c + 1] = 4;
-        if (field[x][y+1].isDeleted()) {
+        if (field[x][y + 1].isDeleted()) {
             deq.push(field[x][y + 1]);
         } else if (field[x][y + 1].num === to.num) {
             return field[x][y + 1];
@@ -241,7 +254,7 @@ function isChildDestination(cur, to) {
 function searchPath(cur, to) {
     let f = isChildDestination(cur, to);
     if (f === undefined) {
-        while( deq.length!==0){
+        while (deq.length !== 0) {
             let child = deq.shift();
             searchPath(child, to);
         }
@@ -301,7 +314,7 @@ function flutter(w1, w2, cnt) {
         img.item(w2.num).style.transition = "top " + 5 + "s";
         img.item(w2.num).style.top = -400 + "px";
         img.item(w1.num).style.top = -400 + "px";
-    }, cnt * 1000 + 500);
+    }, cnt * 1000 + 1000);
 
 }
 

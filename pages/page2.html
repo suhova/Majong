@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Счёт</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,300&display=swap" rel="stylesheet">
+    <link href="../css/style2.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<main>
+    <div id="end_game">
+        <div class="win">ПОЗДРАВЛЯЕМ!</div>
+        <div class="score_text">СЧЁТ ИГРЫ:</div>
+        <script>
+            function getScore(score) {
+                const x = 100-10*score;
+                return `<div class="score">${x}/100 очков</div>`
+            }
+            let score = localStorage.getItem(1);
+            document.getElementById("end_game").innerHTML +=getScore(score);
+        </script>
+        <div id="new"><a href="../index.html">НАЧАТЬ НОВУЮ ИГРУ</a></div>
+    </div>
+</main>
+</body>
+</html>
